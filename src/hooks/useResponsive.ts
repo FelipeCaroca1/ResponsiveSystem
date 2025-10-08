@@ -1,41 +1,38 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import type { 
   ResponsiveState, 
-  Breakpoint, 
-  SpacingType, 
-  TextLevel, 
-  CardType, 
-  ResponsiveClassType,
-  ResponsiveClasses,
-  SpacingConfig
+  Breakpoint
 } from '../types/responsive'
 import { 
-  DEFAULT_BREAKPOINTS, 
-  DEFAULT_SPACING, 
-  DEFAULT_TYPOGRAPHY, 
-  DEFAULT_GRID,
   getCurrentBreakpoint,
-  getBreakpointIndex,
-  getBreakpointValue
+  getBreakpointIndex
 } from '../constants/breakpoints'
-import {
-  generateResponsiveClasses,
-  getResponsiveSpacing,
-  getResponsiveText,
-  getResponsiveGrid,
-  getCardGrid,
-  getResponsiveClass,
-  isBreakpointUp,
-  isBreakpointDown,
-  isBreakpointBetween,
-  isWidthUp,
-  isWidthDown,
-  isWidthBetween,
-  getOrientation,
-  debounce
-} from '../utils/responsiveUtils'
 
-// Hook principal useResponsive
+/**
+ * Debounce utility
+ */
+function debounce<T extends (...args: unknown[]) => void>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: ReturnType<typeof setTimeout> | null = null
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
+
+/**
+ * Get orientation based on dimensions
+ */
+function getOrientation(width: number, height: number): 'landscape' | 'portrait' {
+  return width >= height ? 'landscape' : 'portrait'
+}
+
+/**
+ * Hook principal useResponsive
+ * Provee información sobre el breakpoint actual y helpers para responsive
+ */
 export const useResponsive = (): ResponsiveState => {
   const [dimensions, setDimensions] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 1024,
@@ -61,31 +58,21 @@ export const useResponsive = (): ResponsiveState => {
     if (typeof window === 'undefined') return
 
     window.addEventListener('resize', debouncedUpdateDimensions)
-    window.addEventListener('orientationchange', debouncedUpdateDimensions)
-
+    
     return () => {
       window.removeEventListener('resize', debouncedUpdateDimensions)
-      window.removeEventListener('orientationchange', debouncedUpdateDimensions)
     }
   }, [debouncedUpdateDimensions])
 
+  const { width, height } = dimensions
+
   // Calcular breakpoint actual
-  const breakpoint = useMemo(() => 
-    getCurrentBreakpoint(dimensions.width, DEFAULT_BREAKPOINTS),
-    [dimensions.width]
-  )
+  const breakpoint = useMemo(() => getCurrentBreakpoint(width), [width])
+  
+  // Calcular orientación
+  const orientation = useMemo(() => getOrientation(width, height), [width, height])
 
-  const breakpointValue = useMemo(() => 
-    getBreakpointValue(breakpoint, DEFAULT_BREAKPOINTS),
-    [breakpoint]
-  )
-
-  const breakpointIndex = useMemo(() => 
-    getBreakpointIndex(breakpoint),
-    [breakpoint]
-  )
-
-  // Helpers booleanos específicos
+  // Helpers booleanos por breakpoint específico
   const isXs = breakpoint === 'xs'
   const isSm = breakpoint === 'sm'
   const isMd = breakpoint === 'md'
@@ -96,122 +83,69 @@ export const useResponsive = (): ResponsiveState => {
   const is4Xl = breakpoint === '4xl'
   const is5Xl = breakpoint === '5xl'
 
-  // Helpers agrupados
+  // Helpers booleanos agrupados
   const isMobile = isXs || isSm
   const isTablet = isMd
   const isDesktop = isLg || isXl || is2Xl || is3Xl || is4Xl || is5Xl
-  const isSmall = isMobile || isTablet
-  const isLarge = isDesktop
+  const isSmall = isXs || isSm || isMd
+  const isLarge = isLg || isXl || is2Xl || is3Xl || is4Xl || is5Xl
   const isUltraWide = is3Xl || is4Xl || is5Xl
   const is4K = is4Xl || is5Xl
   const is5K = is5Xl
 
-  // Orientación
-  const orientation = useMemo(() => 
-    getOrientation(dimensions.width, dimensions.height),
-    [dimensions.width, dimensions.height]
-  )
-
+  // Helpers de orientación
   const isPortrait = orientation === 'portrait'
   const isLandscape = orientation === 'landscape'
 
-  // Funciones de comparación
-  const isBreakpointFn = useCallback((targetBreakpoint: Breakpoint) => 
-    breakpoint === targetBreakpoint,
-    [breakpoint]
-  )
+  // Funciones de comparación de breakpoints
+  const isBreakpointUp = useCallback((bp: Breakpoint): boolean => {
+    return getBreakpointIndex(breakpoint) >= getBreakpointIndex(bp)
+  }, [breakpoint])
 
-  const isBreakpointUpFn = useCallback((targetBreakpoint: Breakpoint) => 
-    isBreakpointUp(breakpoint, targetBreakpoint, DEFAULT_BREAKPOINTS),
-    [breakpoint]
-  )
+  const isBreakpointDown = useCallback((bp: Breakpoint): boolean => {
+    return getBreakpointIndex(breakpoint) <= getBreakpointIndex(bp)
+  }, [breakpoint])
 
-  const isBreakpointDownFn = useCallback((targetBreakpoint: Breakpoint) => 
-    isBreakpointDown(breakpoint, targetBreakpoint, DEFAULT_BREAKPOINTS),
-    [breakpoint]
-  )
+  const isBreakpointBetween = useCallback((min: Breakpoint, max: Breakpoint): boolean => {
+    const current = getBreakpointIndex(breakpoint)
+    return current >= getBreakpointIndex(min) && current <= getBreakpointIndex(max)
+  }, [breakpoint])
 
-  const isBreakpointBetweenFn = useCallback((min: Breakpoint, max: Breakpoint) => 
-    isBreakpointBetween(breakpoint, min, max, DEFAULT_BREAKPOINTS),
-    [breakpoint]
-  )
+  // Funciones de comparación de ancho
+  const isWidthUp = useCallback((minWidth: number): boolean => {
+    return width >= minWidth
+  }, [width])
 
-  const isWidthFn = useCallback((width: number) => 
-    dimensions.width === width,
-    [dimensions.width]
-  )
+  const isWidthDown = useCallback((maxWidth: number): boolean => {
+    return width <= maxWidth
+  }, [width])
 
-  const isWidthUpFn = useCallback((width: number) => 
-    isWidthUp(dimensions.width, width),
-    [dimensions.width]
-  )
+  const isWidthBetween = useCallback((minWidth: number, maxWidth: number): boolean => {
+    return width >= minWidth && width <= maxWidth
+  }, [width])
 
-  const isWidthDownFn = useCallback((width: number) => 
-    isWidthDown(dimensions.width, width),
-    [dimensions.width]
-  )
+  // Funciones de comparación de altura
+  const isHeightUp = useCallback((minHeight: number): boolean => {
+    return height >= minHeight
+  }, [height])
 
-  const isWidthBetweenFn = useCallback((min: number, max: number) => 
-    isWidthBetween(dimensions.width, min, max),
-    [dimensions.width]
-  )
+  const isHeightDown = useCallback((maxHeight: number): boolean => {
+    return height <= maxHeight
+  }, [height])
 
-  // Utilidades de Tailwind
-  const getResponsiveClassFn = useCallback((type: ResponsiveClassType) => 
-    getResponsiveClass(type),
-    []
-  )
+  const isHeightBetween = useCallback((minHeight: number, maxHeight: number): boolean => {
+    return height >= minHeight && height <= maxHeight
+  }, [height])
 
-  const getResponsiveClassesFn = useCallback((classes: ResponsiveClasses) => 
-    generateResponsiveClasses(classes, DEFAULT_BREAKPOINTS),
-    []
-  )
+  // Debug mode
+  const debug = false
 
-  const getSpacingFn = useCallback((type: SpacingType) => 
-    getResponsiveSpacing(type, DEFAULT_SPACING),
-    []
-  )
-
-  const getResponsiveSpacingFn = useCallback((config: SpacingConfig) => 
-    getResponsiveGrid(config),
-    []
-  )
-
-  const getTextSizeFn = useCallback((level: TextLevel) => 
-    getResponsiveText(level, DEFAULT_TYPOGRAPHY),
-    []
-  )
-
-  const getResponsiveTextFn = useCallback((config: SpacingConfig) => 
-    getResponsiveGrid(config),
-    []
-  )
-
-  const getCardGridFn = useCallback((type: CardType = 'medium') => 
-    getCardGrid(type, DEFAULT_GRID),
-    []
-  )
-
-  const getResponsiveGridFn = useCallback((config: Record<Breakpoint, string>) => 
-    getResponsiveGrid(config),
-    []
-  )
-
-  // Debug info
-  const debug = useMemo(() => ({
-    breakpoint,
-    width: dimensions.width,
-    height: dimensions.height,
-    orientation,
-    timestamp: Date.now()
-  }), [breakpoint, dimensions.width, dimensions.height, orientation])
-
-  // Retornar el estado completo
   return {
-    // Breakpoint actual
+    // Estado básico
     breakpoint,
-    breakpointValue,
-    breakpointIndex,
+    width,
+    height,
+    orientation,
     
     // Helpers booleanos específicos
     isXs,
@@ -224,7 +158,7 @@ export const useResponsive = (): ResponsiveState => {
     is4Xl,
     is5Xl,
     
-    // Helpers agrupados
+    // Helpers booleanos agrupados
     isMobile,
     isTablet,
     isDesktop,
@@ -234,36 +168,20 @@ export const useResponsive = (): ResponsiveState => {
     is4K,
     is5K,
     
-    // Dimensiones
-    width: dimensions.width,
-    height: dimensions.height,
-    viewportWidth: dimensions.width,
-    viewportHeight: dimensions.height,
-    
-    // Orientación
-    orientation,
+    // Helpers de orientación
     isPortrait,
     isLandscape,
     
     // Funciones de comparación
-    isBreakpoint: isBreakpointFn,
-    isBreakpointUp: isBreakpointUpFn,
-    isBreakpointDown: isBreakpointDownFn,
-    isBreakpointBetween: isBreakpointBetweenFn,
-    isWidth: isWidthFn,
-    isWidthUp: isWidthUpFn,
-    isWidthDown: isWidthDownFn,
-    isWidthBetween: isWidthBetweenFn,
-    
-    // Utilidades de Tailwind
-    getResponsiveClass: getResponsiveClassFn,
-    getResponsiveClasses: getResponsiveClassesFn,
-    getSpacing: getSpacingFn,
-    getResponsiveSpacing: getResponsiveSpacingFn,
-    getTextSize: getTextSizeFn,
-    getResponsiveText: getResponsiveTextFn,
-    getCardGrid: getCardGridFn,
-    getResponsiveGrid: getResponsiveGridFn,
+    isBreakpointUp,
+    isBreakpointDown,
+    isBreakpointBetween,
+    isWidthUp,
+    isWidthDown,
+    isWidthBetween,
+    isHeightUp,
+    isHeightDown,
+    isHeightBetween,
     
     // Debug
     debug

@@ -1,20 +1,28 @@
-import { useState } from 'react'
-import { ResponsiveProvider } from './index'
+import { ResponsiveLayoutProvider } from './providers'
+import { MainLayout } from './layouts'
+import { NavigationProvider, useNavigation } from './context'
 import ResponsiveTestPage from './pages/ResponsiveTestPage'
 import ResponsiveDemo from './components/ResponsiveDemo'
-import Navigation from './components/Navigation'
 
-// App principal
-function App() {
-  const [currentPage, setCurrentPage] = useState<'demo' | 'test'>('test')
-
+// Componente interno que usa el contexto
+function AppContent() {
+  const { currentPage } = useNavigation()
+  
   return (
-    <ResponsiveProvider debug={true}>
-      <div className="min-h-screen bg-gray-50">
-        <Navigation currentPage={currentPage} setCurrentPage={setCurrentPage} />
-        {currentPage === 'demo' ? <ResponsiveDemo /> : <ResponsiveTestPage />}
-      </div>
-    </ResponsiveProvider>
+    <MainLayout>
+      {currentPage === 'demo' ? <ResponsiveDemo /> : <ResponsiveTestPage />}
+    </MainLayout>
+  )
+}
+
+// App principal con providers
+function App() {
+  return (
+    <NavigationProvider defaultPage="test">
+      <ResponsiveLayoutProvider defaultLayout="default">
+        <AppContent />
+      </ResponsiveLayoutProvider>
+    </NavigationProvider>
   )
 }
 

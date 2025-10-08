@@ -1,58 +1,90 @@
 // ========================================
-// SISTEMA RESPONSIVE - FORMA PRINCIPAL
+// SISTEMA RESPONSIVE AUTO-SCALING + LAYOUTS
 // ========================================
 
-// Provider para configuración
-export { ResponsiveProvider } from './providers/ResponsiveProvider'
+/**
+ * CÓMO USAR ESTE SISTEMA:
+ * 
+ * 1. Instala el plugin en tailwind.config.js:
+ *    import responsiveScalePlugin from './src/plugin/responsiveScalePlugin.js'
+ *    plugins: [responsiveScalePlugin()]
+ * 
+ * 2. Usa el ResponsiveLayoutProvider + MainLayout:
+ *    <ResponsiveLayoutProvider defaultLayout="default">
+ *      <MainLayout layout="default">
+ *        <App />
+ *      </MainLayout>
+ *    </ResponsiveLayoutProvider>
+ * 
+ * 3. Usa Tailwind NORMAL en tus páginas:
+ *    <div className="p-6 text-base">
+ *      TODO escala automáticamente + layout consistente
+ *    </div>
+ * 
+ * 4. (Opcional) Usa hooks para casos avanzados:
+ *    const { layout, responsive } = useResponsiveLayout()
+ */
 
-// Componentes Wrapper (RECOMENDADO - Forma más simple y limpia)
+// ========================================
+// EXPORTS PRINCIPALES
+// ========================================
+
+// Providers
+export { ResponsiveLayoutProvider, ResponsiveProvider } from './providers'
+
+// Layouts
 export { 
-  Container, 
-  Heading, 
-  Text, 
-  Grid, 
-  Card, 
-  Button 
-} from './components/responsive'
+  MainLayout,
+  DefaultLayout, 
+  SidebarLayout, 
+  DashboardLayout, 
+  MinimalLayout 
+} from './layouts'
 
-// Hook directo (Para usuarios avanzados)
-export { useResponsive } from './hooks/useResponsive'
+// Hooks
+export { useResponsiveLayout, useLayout, useResponsive } from './hooks'
 
-// ========================================
-// EXPORTS AVANZADOS (OPCIONALES)
-// ========================================
+// Componentes de layout
+export { Header, Sidebar, Footer, Navigation } from './components/layout'
 
-// Tipos
-export * from './types/responsive'
+// LayoutSwitcher
+export { default as LayoutSwitcher } from './components/LayoutSwitcher'
 
-// Constantes
-export * from './constants/breakpoints'
-
-// Utilidades
-export * from './utils/responsiveUtils'
-
-// Hooks avanzados (solo si necesitas configuración específica)
+// Context (para casos avanzados)
 export { 
-  useResponsiveConfig,
-  useBreakpoints,
-  useSpacing,
-  useTypography,
-  useGrid,
-  useDebug
-} from './hooks/useResponsiveConfig'
+  useResponsiveLayoutContext, 
+  SidebarProvider, 
+  useSidebar,
+  NavigationProvider,
+  useNavigation
+} from './context'
 
-// HOC (solo para casos especiales como componentes de clase)
-export { withResponsiveConfig } from './hocs/withResponsiveConfig'
+// Tipos TypeScript
+export type { 
+  Breakpoint,
+  Orientation,
+  ResponsiveState,
+  ResponsiveProviderProps
+} from './types/responsive'
+
+// Constantes (para casos avanzados)
+export { 
+  DEFAULT_BREAKPOINTS,
+  getCurrentBreakpoint,
+  getBreakpointIndex,
+  getBreakpointValue
+} from './constants/breakpoints'
+
+// Configuración de layouts
+export { LAYOUT_CONFIG, DEFAULT_LAYOUT, AVAILABLE_LAYOUTS } from './config/layout'
+export type { LayoutConfig } from './config/layout'
+
+// Plugin de Tailwind (importar directamente en tailwind.config.js)
+// import responsiveScalePlugin from './src/plugin/responsiveScalePlugin.js'
 
 // ========================================
-// PÁGINAS DE EJEMPLO (OPCIONALES)
+// EJEMPLOS (Solo para testing en este proyecto)
 // ========================================
 
-// Página de test completa
 export { default as ResponsiveTestPage } from './pages/ResponsiveTestPage'
-
-// Demo básico
 export { default as ResponsiveDemo } from './components/ResponsiveDemo'
-
-// Navegación de ejemplo
-export { default as Navigation } from './components/Navigation'

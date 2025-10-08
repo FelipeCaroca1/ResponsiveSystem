@@ -1,18 +1,18 @@
-import { useResponsive } from '../hooks/useResponsive'
-import { Container, Heading, Text, Grid, Card, Button } from '../components/responsive'
+import { useResponsiveLayout } from '../hooks'
+import LayoutSwitcher from '../components/LayoutSwitcher'
 
 // Componente de indicador de breakpoint
 const BreakpointIndicator = () => {
-  const { breakpoint, width, height, orientation, debug } = useResponsive()
+  const { breakpoint, width, height, orientation, debug } = useResponsiveLayout()
   
   return (
     <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-      <Container className="bg-black/80 backdrop-blur-sm text-white rounded-full shadow-xl border border-white/20 flex items-center min-w-max transition-all duration-300">
-        <span className="font-bold text-blue-300 mr-3 sm:mr-4">Breakpoint: {breakpoint}</span>
-        <span className="text-green-300 mr-3 sm:mr-4">{width}×{height}</span>
-        <span className="text-purple-300 mr-3 sm:mr-4">{orientation}</span>
-        {debug && <span className="text-yellow-300 font-semibold">Debug</span>}
-      </Container>
+      <div className="bg-black/90 backdrop-blur-sm text-white rounded-full shadow-xl border border-white/20 px-6 py-3 flex items-center space-x-4 min-w-max">
+        <span className="font-bold text-blue-300 text-sm">Breakpoint: {breakpoint}</span>
+        <span className="text-green-300 text-sm">{width}×{height}</span>
+        <span className="text-purple-300 text-sm">{orientation}</span>
+        {debug && <span className="text-yellow-300 font-semibold text-sm">Debug</span>}
+      </div>
     </div>
   )
 }
@@ -22,7 +22,7 @@ const BooleanHelpersTest = () => {
   const {
     isXs, isSm, isMd, isLg, isXl, is2Xl, is3Xl, is4Xl, is5Xl,
     isMobile, isTablet, isDesktop, isSmall, isLarge, isUltraWide, is4K, is5K
-  } = useResponsive()
+  } = useResponsiveLayout()
 
   const helpers = [
     { name: 'isXs', value: isXs },
@@ -48,41 +48,46 @@ const BooleanHelpersTest = () => {
   ]
 
   return (
-    <div className="space-y-4">
-      <Heading level="h2" className="text-gray-800 mb-4">Boolean Helpers Test</Heading>
+    <div className="space-y-6">
+      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Boolean Helpers</h2>
+      <div className="w-8 h-0.5 bg-cyan-400 mb-4"></div>
       
       <div>
-        <Heading level="h4" className="mb-3 text-gray-700">Specific Breakpoints</Heading>
-        <Grid type="small" gap="2">
+        <h4 className="text-sm font-bold mb-3 text-gray-500 tracking-widest uppercase">Specific Breakpoints</h4>
+        <div className="grid grid-cols-3 gap-2">
           {helpers.map(helper => (
-            <Card
+            <div
               key={helper.name}
-              className={`rounded text-center min-h-[60px] flex flex-col justify-center ${
-                helper.value ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-600 border border-gray-200'
+              className={`p-4 rounded-lg text-center min-h-[60px] flex flex-col justify-center border transition-all ${
+                helper.value 
+                  ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' 
+                  : 'bg-black/30 text-gray-600 border-gray-800'
               }`}
             >
-              <div className="font-medium break-words">{helper.name}</div>
-              <Heading level="h4" className="mt-1">{helper.value ? '✓' : '✗'}</Heading>
-            </Card>
+              <div className="font-bold break-words text-sm">{helper.name}</div>
+              <div className="text-lg font-black mt-1">{helper.value ? '●' : '○'}</div>
+            </div>
           ))}
-        </Grid>
+        </div>
       </div>
 
       <div>
-        <Heading level="h4" className="mb-3 text-gray-700">Grouped Helpers</Heading>
-        <Grid type="small" gap="2">
+        <h4 className="text-sm font-bold mb-3 text-gray-500 tracking-widest uppercase">Grouped Helpers</h4>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {groupedHelpers.map(helper => (
-            <Card
+            <div
               key={helper.name}
-              className={`rounded text-center min-h-[60px] flex flex-col justify-center ${
-                helper.value ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-gray-100 text-gray-600 border border-gray-200'
+              className={`p-4 rounded-lg text-center min-h-[60px] flex flex-col justify-center border transition-all ${
+                helper.value 
+                  ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' 
+                  : 'bg-black/30 text-gray-600 border-gray-800'
               }`}
             >
-              <div className="font-medium break-words">{helper.name}</div>
-              <Heading level="h4" className="mt-1">{helper.value ? '✓' : '✗'}</Heading>
-            </Card>
+              <div className="font-bold break-words text-sm">{helper.name}</div>
+              <div className="text-lg font-black mt-1">{helper.value ? '●' : '○'}</div>
+            </div>
           ))}
-        </Grid>
+        </div>
       </div>
     </div>
   )
@@ -97,7 +102,7 @@ const ComparisonTest = () => {
     isWidthUp,
     isWidthDown,
     isWidthBetween
-  } = useResponsive()
+  } = useResponsiveLayout()
 
   const tests = [
     { name: 'isBreakpointUp("md")', value: isBreakpointUp('md') },
@@ -109,23 +114,26 @@ const ComparisonTest = () => {
   ]
 
   return (
-    <div className="space-y-4">
-      <Heading level="h2" className="text-gray-800 mb-4">Comparison Functions Test</Heading>
-      <Grid type="medium" gap="3">
+    <div className="space-y-6">
+      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Comparison Functions</h2>
+      <div className="w-8 h-0.5 bg-gray-700 mb-4"></div>
+      <div className="grid grid-cols-auto-md gap-3">
         {tests.map(test => (
-          <Card
+          <div
             key={test.name}
-            className={`rounded-lg border min-h-[80px] ${
-              test.value ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'
+            className={`p-4 rounded-lg border min-h-[80px] flex flex-col justify-center transition-all ${
+              test.value 
+                ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' 
+                : 'bg-black/30 text-gray-600 border-gray-800'
             }`}
           >
-            <Text size="caption" className="font-mono mb-2 break-words overflow-wrap-anywhere">
+            <p className="font-mono text-xs mb-2 break-words">
               {test.name}
-            </Text>
-            <Heading level="h4">{test.value ? 'TRUE' : 'FALSE'}</Heading>
-          </Card>
+            </p>
+            <p className="text-lg font-black">{test.value ? 'TRUE' : 'FALSE'}</p>
+          </div>
         ))}
-      </Grid>
+      </div>
     </div>
   )
 }
@@ -133,189 +141,259 @@ const ComparisonTest = () => {
 // Componente de test de utilidades de Tailwind
 const TailwindUtilsTest = () => {
   return (
-    <div className="space-y-4">
-      <Heading level="h2" className="text-gray-800 mb-4">Tailwind Utilities Test</Heading>
-      
-      {/* Test de Spacing */}
-      <div>
-        <Heading level="h4" className="mb-2 text-gray-700">Spacing Test</Heading>
-        <Container className="bg-blue-100 rounded-lg border border-blue-200">
-          <Text className="text-blue-800">Spacing responsive automático</Text>
-        </Container>
-      </div>
+    <div className="space-y-6">
+      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Auto-Scale Properties</h2>
+      <div className="w-8 h-0.5 bg-cyan-400 mb-6"></div>
 
-      {/* Test de Typography */}
-      <div>
-        <Heading level="h4" className="mb-2 text-gray-700">Typography Test</Heading>
-        <div className="space-y-1">
-          <Heading level="h1" className="text-gray-800">H1</Heading>
-          <Heading level="h2" className="text-gray-700">H2</Heading>
-          <Heading level="h3" className="text-gray-600">H3</Heading>
-          <Text className="text-gray-600">Body text</Text>
-          <Text size="caption" className="text-gray-500">Caption</Text>
-        </div>
-      </div>
-
-      {/* Test de Grid */}
-      <div>
-        <Heading level="h4" className="mb-2 text-gray-700">Grid Test</Heading>
-        <Grid gap="2">
-          {[1, 2, 3, 4].map(i => (
-            <Card key={i} className="bg-gray-100 rounded text-center">
-              Card {i}
-            </Card>
-          ))}
-        </Grid>
-      </div>
-
-      {/* Test de Responsive Classes */}
-      <div>
-        <Heading level="h4" className="mb-2 text-gray-700">Responsive Classes</Heading>
-        <div className="space-y-2">
-          <Button className="bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
-            Button
-          </Button>
-          <Container className="bg-gray-100 rounded">
-            Container
-          </Container>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Componente de test de grid responsive
-const GridTest = () => {
-  const gridTypes = ['small', 'medium', 'large'] as const
-
-  return (
-    <div className="space-y-4">
-      <Heading level="h2" className="text-gray-800 mb-4">Grid System Test</Heading>
-      
-      {gridTypes.map(type => (
-        <div key={type}>
-          <Heading level="h4" className="mb-2 text-gray-700 capitalize">Grid {type}</Heading>
-          <Grid type={type} gap="2">
-            {Array.from({ length: 6 }, (_, i) => (
-              <Card key={i} className="bg-gray-100 rounded text-center">
-                {i + 1}
-              </Card>
+      {/* Fila 1: Grid Auto-responsive y Line Height */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Grid Auto-responsive */}
+        <div>
+          <h4 className="text-lg font-semibold mb-4 text-cyan-400">Grid Auto-responsive</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="p-4 bg-black/30 rounded-lg text-center text-sm border border-gray-700 hover:border-cyan-500/30 transition-all">
+                <p className="text-gray-300 font-medium">Card {i}</p>
+              </div>
             ))}
-          </Grid>
+          </div>
         </div>
-      ))}
+
+        {/* Line Height */}
+        <div>
+          <h4 className="text-lg font-semibold mb-4 text-cyan-400">Line Height (Auto-scale)</h4>
+          <div className="space-y-4">
+            <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
+              <p className="text-base leading-relaxed text-gray-300">
+                Este párrafo usa <code className="bg-cyan-500/20 text-cyan-400 px-1 rounded">leading-relaxed</code>. 
+                El line-height escala automáticamente para mejor legibilidad.
+              </p>
+            </div>
+            <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
+              <p className="text-base leading-loose text-gray-300">
+                Este párrafo usa <code className="bg-cyan-500/20 text-cyan-400 px-1 rounded">leading-loose</code>. 
+                Con espaciado mayor que se adapta a cada pantalla.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Fila 2: Letter Spacing y Shadows */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        {/* Letter Spacing */}
+        <div>
+          <h4 className="text-lg font-semibold mb-4 text-cyan-400">Letter Spacing (Auto-scale)</h4>
+          <div className="space-y-3">
+            <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
+              <p className="text-base tracking-tight text-gray-300">
+                <code className="bg-cyan-500/20 text-cyan-400 px-1 rounded">tracking-tight</code> - Texto compacto
+              </p>
+            </div>
+            <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
+              <p className="text-base tracking-normal text-gray-300">
+                <code className="bg-cyan-500/20 text-cyan-400 px-1 rounded">tracking-normal</code> - Espaciado normal
+              </p>
+            </div>
+            <div className="bg-black/30 p-4 rounded-lg border border-gray-700">
+              <p className="text-base tracking-wide text-gray-300">
+                <code className="bg-cyan-500/20 text-cyan-400 px-1 rounded">tracking-wide</code> - Espaciado amplio
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Shadows */}
+        <div>
+          <h4 className="text-lg font-semibold mb-4 text-cyan-400">Shadows (Auto-scale)</h4>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 bg-black/30 shadow-sm rounded-lg text-center border border-gray-700">
+              <p className="text-sm font-medium text-gray-300">shadow-sm</p>
+            </div>
+            <div className="p-4 bg-black/30 shadow-md rounded-lg text-center border border-gray-700">
+              <p className="text-sm font-medium text-gray-300">shadow-md</p>
+            </div>
+            <div className="p-4 bg-black/30 shadow-lg rounded-lg text-center border border-gray-700">
+              <p className="text-sm font-medium text-gray-300">shadow-lg</p>
+            </div>
+            <div className="p-4 bg-black/30 shadow-xl rounded-lg text-center border border-gray-700">
+              <p className="text-sm font-medium text-gray-300">shadow-xl</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Fila 3: Buttons */}
+      <div>
+        <h4 className="text-lg font-semibold mb-4 text-cyan-400">Buttons (Auto-scale)</h4>
+        <div className="flex flex-wrap gap-4">
+          <button className="px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors font-semibold">
+            Button Normal
+          </button>
+          <button className="px-8 py-4 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold">
+            Button Grande
+          </button>
+          <button className="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors text-sm">
+            Button Pequeño
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
 
 // Componente de test de orientación
 const OrientationTest = () => {
-  const { orientation, isPortrait, isLandscape, width, height } = useResponsive()
+  const { orientation, isPortrait, isLandscape } = useResponsiveLayout()
 
   return (
     <div className="space-y-4">
-      <Heading level="h2" className="text-gray-800 mb-4">Orientation Test</Heading>
-      
-      <Grid type="small" gap="3">
-        <Card className={`rounded-lg border text-center ${isPortrait ? 'bg-green-100 text-green-800 border-green-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}>
-          <Text size="caption" className="font-semibold">Portrait</Text>
-          <Heading level="h4">{isPortrait ? '✓' : '✗'}</Heading>
-        </Card>
-        
-        <Card className={`rounded-lg border text-center ${isLandscape ? 'bg-green-100 text-green-800 border-green-200' : 'bg-gray-100 text-gray-600 border-gray-200'}`}>
-          <Text size="caption" className="font-semibold">Landscape</Text>
-          <Heading level="h4">{isLandscape ? '✓' : '✗'}</Heading>
-        </Card>
-      </Grid>
-      
-      <Container className="bg-blue-100 rounded-lg border border-blue-200">
-        <div className="text-blue-800 space-y-1">
-          <Text><strong>Orientation:</strong> {orientation}</Text>
-          <Text><strong>Dimensions:</strong> {width} x {height}</Text>
-          <Text><strong>Ratio:</strong> {(width / height).toFixed(2)}</Text>
+      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Orientation</h2>
+      <div className="w-8 h-0.5 bg-cyan-400 mb-6"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-6 bg-black/30 rounded-lg border border-gray-700 text-center">
+          <p className="font-semibold text-cyan-400 text-lg mb-2">Current</p>
+          <p className="text-gray-300 text-base">{orientation}</p>
         </div>
-      </Container>
+        <div className="p-6 bg-black/30 rounded-lg border border-gray-700 text-center">
+          <p className="font-semibold text-cyan-400 text-lg mb-2">Portrait</p>
+          <p className="text-gray-300 text-base">{isPortrait ? '●' : '○'}</p>
+        </div>
+        <div className="p-6 bg-black/30 rounded-lg border border-gray-700 text-center">
+          <p className="font-semibold text-cyan-400 text-lg mb-2">Landscape</p>
+          <p className="text-gray-300 text-base">{isLandscape ? '●' : '○'}</p>
+        </div>
+      </div>
     </div>
   )
 }
 
-// Componente principal de la página de test
-const ResponsiveTestPage = () => {
-  const { debug } = useResponsive()
-
+// Componente de test de grid
+const GridTest = () => {
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <BreakpointIndicator />
+    <div className="space-y-4">
+      <h2 className="text-3xl font-black text-white mb-2 tracking-tight">Grid System</h2>
+      <div className="w-8 h-0.5 bg-cyan-400 mb-4"></div>
       
-      {/* Contenedor principal con padding responsivo */}
-      <div className="w-full max-w-7xl mx-auto">
-        <Container>
-          {/* Header mejorado - usando componentes wrapper */}
-          <header className="text-center mb-8 bg-white rounded-lg shadow-sm w-full">
-            <Container>
-              <Heading level="h1" className="text-gray-800 mb-4">
-                Responsive System Test Page
-              </Heading>
-              <Text className="text-gray-600 mb-4">
-                Testa todas las funcionalidades del sistema responsive
-              </Text>
-              {debug && (
-                <div className="inline-block bg-yellow-100 text-yellow-800 rounded-lg font-semibold">
-                  <Container>
-                    <Text size="caption">Debug Mode: ON</Text>
-                  </Container>
-                </div>
-              )}
-            </Container>
-          </header>
-
-          {/* Grid principal responsivo - usando componentes wrapper */}
-          <Grid type="large" gap="6" className="mb-8 w-full">
-            {/* Columna izquierda */}
-            <div className="space-y-6">
-              <Card className="bg-white rounded-lg shadow-sm w-full">
-                <BooleanHelpersTest />
-              </Card>
-              
-              <Card className="bg-white rounded-lg shadow-sm w-full">
-                <ComparisonTest />
-              </Card>
-              
-              <Card className="bg-white rounded-lg shadow-sm w-full">
-                <OrientationTest />
-              </Card>
+      <div>
+        <h4 className="text-lg font-semibold mb-2 text-gray-700">Auto-responsive Grid</h4>
+        <div className="grid grid-cols-auto-sm gap-4">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="p-6 bg-indigo-100 rounded-lg text-center border border-indigo-200">
+              <p className="font-bold text-indigo-800 text-base">Item {i}</p>
             </div>
-
-            {/* Columna derecha */}
-            <div className="space-y-6">
-              <Card className="bg-white rounded-lg shadow-sm w-full">
-                <TailwindUtilsTest />
-              </Card>
-              
-              <Card className="bg-white rounded-lg shadow-sm w-full">
-                <GridTest />
-              </Card>
-            </div>
-          </Grid>
-
-          {/* Footer mejorado - usando componentes wrapper */}
-          <footer className="bg-white rounded-lg shadow-sm text-center w-full">
-            <Container>
-              <div className="space-y-2">
-                <Text className="text-gray-600 font-medium">
-                  Redimensiona la ventana para ver los cambios en tiempo real
-                </Text>
-                <div className="flex justify-center">
-                  <Text size="caption" className="text-gray-500">
-                    Breakpoint actual visible en la parte inferior
-                  </Text>
-                </div>
-              </div>
-            </Container>
-          </footer>
-        </Container>
+          ))}
+        </div>
       </div>
     </div>
+  )
+}
+
+// Página principal
+const ResponsiveTestPage = () => {
+  const { debug } = useResponsiveLayout()
+
+  return (
+    <div>
+      <BreakpointIndicator />
+      
+      {/* Contenedor principal */}
+      <div className="w-full">
+          {/* Header elegante */}
+          <header className="text-center mb-6 bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl p-6 border border-cyan-500/20">
+            <div className="inline-block bg-black/50 backdrop-blur-sm border border-cyan-500/30 text-cyan-400 rounded-lg px-4 py-2 mb-4">
+              <p className="text-xs font-bold tracking-widest uppercase">Suite de Pruebas</p>
+            </div>
+            <h1 className="text-4xl font-black text-white mb-4 tracking-tighter leading-none">
+              Test del Sistema
+            </h1>
+            <p className="text-base text-gray-400 mb-3 leading-relaxed tracking-wide">
+              Validación completa de propiedades auto-escalables
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 text-sm">
+              <span className="text-gray-500">Tipografía</span>
+              <span className="text-gray-700">•</span>
+              <span className="text-gray-500">Espaciado</span>
+              <span className="text-gray-700">•</span>
+              <span className="text-gray-500">Alto de Línea</span>
+              <span className="text-gray-700">•</span>
+              <span className="text-gray-500">Espaciado de Letras</span>
+              <span className="text-gray-700">•</span>
+              <span className="text-gray-500">Sombras</span>
+            </div>
+            {debug && (
+              <div className="inline-block bg-yellow-900/30 border border-yellow-600/30 text-yellow-400 rounded-lg font-bold px-4 py-2 mt-4">
+                <p className="text-sm tracking-widest uppercase">Modo Debug Activo</p>
+              </div>
+            )}
+          </header>
+
+          {/* Layout profesional - jerarquía lógica */}
+          <div className="mb-6 space-y-6">
+            
+            {/* Fila 1: Boolean Helpers - Ancho completo */}
+            <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl p-6 border border-cyan-500/20 hover:border-cyan-500/40 transition-all">
+              <BooleanHelpersTest />
+            </div>
+
+            {/* Fila 2: Auto-scale Properties - Ancho completo */}
+            <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl p-6 border border-gray-800 hover:border-gray-700 transition-all">
+              <TailwindUtilsTest />
+            </div>
+
+            {/* Fila 3: Orientation - Horizontal */}
+            <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl p-6 border border-cyan-500/20 hover:border-cyan-500/40 transition-all">
+              <OrientationTest />
+            </div>
+
+            {/* Fila 3: Comparaciones y tests principales */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl p-6 border border-gray-800 hover:border-gray-700 transition-all">
+                <ComparisonTest />
+              </div>
+              
+              <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl p-6 border border-cyan-500/20 hover:border-cyan-500/40 transition-all">
+                <GridTest />
+              </div>
+            </div>
+
+          </div>
+
+          {/* Layout Switcher */}
+          <div className="mb-6">
+            <LayoutSwitcher />
+          </div>
+
+          {/* Footer*/}
+          <footer className="bg-gradient-to-br from-gray-900 to-black rounded-2xl shadow-2xl text-center p-6 border border-cyan-500/20">
+            <div className="space-y-4">
+              <div className="w-12 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto"></div>
+              <p className="text-2xl font-black text-white leading-none tracking-tighter">
+                Sistema en Vivo
+              </p>
+              <p className="text-base text-gray-400 leading-relaxed tracking-wide max-w-2xl mx-auto">
+                Redimensiona tu ventana para observar el comportamiento de escalado automático en tiempo real
+              </p>
+              <div className="flex justify-center gap-3 flex-wrap mt-4">
+                <div className="bg-black/50 backdrop-blur-sm border border-cyan-500/30 px-4 py-2 rounded-lg">
+                  <p className="text-sm font-bold tracking-widest text-cyan-400 uppercase">5 Propiedades</p>
+                </div>
+                <div className="bg-black/50 backdrop-blur-sm border border-gray-700 px-4 py-2 rounded-lg">
+                  <p className="text-sm font-bold tracking-widest text-gray-400 uppercase">9 Breakpoints</p>
+                </div>
+                <div className="bg-black/50 backdrop-blur-sm border border-gray-700 px-4 py-2 rounded-lg">
+                  <p className="text-sm font-bold tracking-widest text-gray-400 uppercase">Auto-Escalado</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mt-4 leading-relaxed tracking-wide">
+                Indicador de breakpoint ubicado en la parte inferior central
+              </p>
+            </div>
+          </footer>
+        </div>
+      </div>
   )
 }
 
