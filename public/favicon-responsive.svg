@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1a1a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cyanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fondo -->
+  <circle cx="16" cy="16" r="15" fill="url(#bgGradient)" stroke="url(#cyanGradient)" stroke-width="1.5"/>
+  
+  <!-- Representación de escalado: rectángulos de diferentes tamaños -->
+  <!-- Rectángulo pequeño (móvil) -->
+  <rect x="6" y="10" width="4" height="6" fill="url(#cyanGradient)" opacity="0.7"/>
+  
+  <!-- Rectángulo mediano (tablet) -->
+  <rect x="12" y="8" width="6" height="8" fill="url(#cyanGradient)" opacity="0.8"/>
+  
+  <!-- Rectángulo grande (desktop) -->
+  <rect x="20" y="6" width="6" height="10" fill="url(#cyanGradient)" opacity="1"/>
+  
+  <!-- Flecha indicando escalado -->
+  <path d="M8 20 L24 20 M22 18 L24 20 L22 22" 
+        stroke="url(#cyanGradient)" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" 
+        fill="none"/>
+</svg>
