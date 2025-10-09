@@ -11,10 +11,23 @@
 - ✅ **9 Breakpoints**: xs, sm, md, lg, xl, 2xl, 3xl (1920px), 4xl (2560px), 5xl (3840px)
 - ✅ **TypeScript**: 100% type-safe
 - ✅ **Zero Dependencies**: Solo Tailwind CSS
+- ✅ **No Invasivo**: Instala solo lo que necesites ([Ver guía](INSTALLATION.md))
 
 ---
 
-## 🚀 Instalación Rápida
+## 📦 ¿Tenés un proyecto existente?
+
+**Este sistema NO es invasivo.** Podés instalarlo de 3 formas:
+
+1. **Solo el plugin** (1 archivo) - Auto-scaling sin tocar tu código
+2. **Con hooks** (~8 archivos) - Detección de breakpoints en JS
+3. **Sistema completo** (~30 archivos) - Layouts incluidos
+
+👉 **[Ver guía completa de instalación](INSTALLATION.md)**
+
+---
+
+## 🚀 Instalación Rápida (Proyecto Nuevo)
 
 ### **1. Configura el Plugin en Tailwind**
 
