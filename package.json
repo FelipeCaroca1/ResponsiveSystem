@@ -24,10 +24,10 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "dist/*.mjs",
-    "dist/*.cjs",
-    "dist/*.d.ts",
-    "dist/*.map",
+    "dist/**/*.mjs",
+    "dist/**/*.cjs",
+    "dist/**/*.d.ts",
+    "dist/**/*.map",
     "src/plugin",
     "scripts",
     "README.md",
