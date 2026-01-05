@@ -68,6 +68,42 @@ ${exportLines.join('\n')}
 
 writeFileSync(indexDtsPath, dtsContent, 'utf-8')
 
+// Generar index.d.ts para subdirectorios (barrel exports)
+const barrelExports = [
+  { key: 'providers', path: resolve(projectRoot, 'src', 'providers', 'index.ts') },
+  { key: 'layouts', path: resolve(projectRoot, 'src', 'layouts', 'index.ts') },
+  { key: 'hooks', path: resolve(projectRoot, 'src', 'hooks', 'index.ts') },
+  { key: 'components/layout', path: resolve(projectRoot, 'src', 'components', 'layout', 'index.ts') },
+  { key: 'context', path: resolve(projectRoot, 'src', 'context', 'index.ts') },
+]
+
+for (const { key, path: srcPath } of barrelExports) {
+  if (existsSync(srcPath)) {
+    const content = readFileSync(srcPath, 'utf-8')
+    const exportLines = []
+    const lines = content.split('\n')
+    
+    for (const line of lines) {
+      const trimmed = line.trim()
+      if (trimmed.startsWith('export ')) {
+        exportLines.push(trimmed)
+      }
+    }
+    
+    if (exportLines.length > 0) {
+      const destPath = resolve(distPath, key, 'index.d.ts')
+      const dir = resolve(distPath, key)
+      
+      if (!existsSync(dir)) {
+        mkdirSync(dir, { recursive: true })
+      }
+      
+      const dtsContent = `// Auto-generated from src/${key}/index.ts\n${exportLines.join('\n')}\n`
+      writeFileSync(destPath, dtsContent, 'utf-8')
+    }
+  }
+}
+
 // Restaurar tipos individuales desde .temp-types si existen
 const tempTypesPath = resolve(projectRoot, '.temp-types')
 if (existsSync(tempTypesPath)) {
