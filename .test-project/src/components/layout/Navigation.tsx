@@ -1,4 +1,4 @@
-import { useResponsiveLayout } from '../../hooks'
+import { useResponsiveLayout } from 'responsive-system'
 
 const Navigation = () => {
   const { isMobile } = useResponsiveLayout()

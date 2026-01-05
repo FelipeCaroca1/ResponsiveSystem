@@ -1,11 +1,14 @@
 {
   "name": "responsive-system",
-  "version": "1.0.0",
+  "version": "1.6.1",
   "description": "Sistema de layout responsivo con auto-scaling para Tailwind CSS",
   "type": "module",
   "main": "./dist/responsive-system.cjs",
   "module": "./dist/responsive-system.mjs",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "responsive-system-setup": "./scripts/postinstall.js"
+  },
   "exports": {
     ".": {
       "import": {
@@ -28,11 +31,10 @@
     "dist/**/*.cjs",
     "dist/**/*.d.ts",
     "dist/**/*.map",
+    "src",
     "src/plugin",
     "scripts",
-    "README.md",
-    "ARCHITECTURE.md",
-    "INSTALLATION.md"
+    "README.md"
   ],
   "keywords": [
     "responsive",
@@ -56,11 +58,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
-    "postinstall": "node scripts/postinstall.js"
+    "postinstall": "node scripts/postinstall.js",
+    "test:postinstall": "node scripts/test-postinstall.js"
   },
   "dependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
     "tailwindcss": "^4.1.14",
     "postcss": "^8.5.6",
     "autoprefixer": "^10.4.21",

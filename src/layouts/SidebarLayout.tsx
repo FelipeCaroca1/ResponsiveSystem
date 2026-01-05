@@ -1,5 +1,4 @@
 import React from 'react'
-import { useResponsiveLayout } from '../hooks'
 import { Sidebar } from '../components/layout'
 import { SidebarProvider } from '../context'
 
@@ -8,18 +7,14 @@ interface SidebarLayoutProps {
 }
 
 const SidebarLayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { layoutUtils } = useResponsiveLayout()
-  
   return (
-    <div className="min-h-screen bg-black flex">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <Sidebar />
       
       {/* Main content */}
       <main className="flex-1 overflow-auto">
-        <div className={layoutUtils.getContainerClass()}>
           {children}
-        </div>
       </main>
     </div>
   )

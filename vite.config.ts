@@ -32,7 +32,17 @@ export default defineConfig({
       fileName: (format) => `responsive-system.${format === 'es' ? 'mjs' : 'cjs'}`,
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: (id) => {
+        // Externalizar React y todas sus dependencias
+        if (id === 'react' || id === 'react-dom' || id === 'react/jsx-runtime') {
+          return true
+        }
+        // Externalizar imports que empiezan con 'react/'
+        if (id.startsWith('react/')) {
+          return true
+        }
+        return false
+      },
       output: {
         globals: {
           react: 'React',

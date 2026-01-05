@@ -32,7 +32,15 @@ const ResponsiveLayoutProviderInner: React.FC<ResponsiveLayoutProviderInnerProps
   const customResponsive = useResponsiveHook?.()
   const responsive = customResponsive || internalResponsive
   
-  const [currentLayout, setCurrentLayout] = useState(defaultLayout)
+  // Inicializar el estado con el layout normalizado usando función inicializadora
+  // Esto asegura que solo se ejecute una vez, incluso con React.StrictMode
+  const [currentLayout, setCurrentLayout] = useState(() => {
+    // Validar y normalizar el defaultLayout directamente en la función inicializadora
+    if (defaultLayout && typeof defaultLayout === 'string' && LAYOUT_CONFIG[defaultLayout]) {
+      return defaultLayout
+    }
+    return DEFAULT_LAYOUT
+  })
   
   const layoutConfig = LAYOUT_CONFIG[currentLayout] || LAYOUT_CONFIG[DEFAULT_LAYOUT]
   
@@ -79,10 +87,15 @@ export const ResponsiveLayoutProvider: React.FC<ResponsiveLayoutProviderProps> =
   defaultLayout = DEFAULT_LAYOUT,
   useResponsiveHook
 }) => {
+  // Normalizar el defaultLayout antes de pasarlo al componente interno
+  const normalizedDefaultLayout = (defaultLayout && typeof defaultLayout === 'string' && LAYOUT_CONFIG[defaultLayout])
+    ? defaultLayout
+    : DEFAULT_LAYOUT
+  
   return (
     <ResponsiveProvider>
       <ResponsiveLayoutProviderInner 
-        defaultLayout={defaultLayout}
+        defaultLayout={normalizedDefaultLayout}
         useResponsiveHook={useResponsiveHook}
       >
         {children}

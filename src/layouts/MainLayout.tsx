@@ -19,10 +19,7 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ children, layout: layoutProp }) => {
   const { layout } = useResponsiveLayout()
   
-  // Usar el layout del prop si se proporciona, sino usar el del contexto
-  const currentLayout = layoutProp || layout.current
-  
-  // Seleccionar el layout apropiado basado en el estado del contexto o prop
+  // Mapa de layouts disponibles
   const layouts = {
     default: DefaultLayout,
     sidebar: SidebarLayout,
@@ -30,7 +27,16 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, layout: layoutProp })
     minimal: MinimalLayout,
   }
   
-  const LayoutComponent = layouts[currentLayout as keyof typeof layouts] || DefaultLayout
+  // Determinar qué layout usar: prop > contexto > default
+  const layoutToUse = layoutProp || layout.current || 'default'
+  
+  // Validar que el layout sea válido, si no usar default
+  const validLayout = (layoutToUse && layouts[layoutToUse as keyof typeof layouts])
+    ? layoutToUse
+    : 'default'
+  
+  // Obtener el componente de layout
+  const LayoutComponent = layouts[validLayout as keyof typeof layouts] || DefaultLayout
   
   return <LayoutComponent>{children}</LayoutComponent>
 }
