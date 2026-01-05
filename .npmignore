@@ -6,6 +6,9 @@ node_modules/
 *.local
 
 # Build y desarrollo (dist/ NO se excluye, es necesario para el paquete)
+# Pero excluimos archivos de ejemplo dentro de dist/
+dist/*.svg
+dist/favicon*
 .vite/
 .temp/
 .cache/

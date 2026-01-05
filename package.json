@@ -24,7 +24,10 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "dist",
+    "dist/*.mjs",
+    "dist/*.cjs",
+    "dist/*.d.ts",
+    "dist/*.map",
     "src/plugin",
     "scripts",
     "README.md",
@@ -48,7 +51,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc --project tsconfig.build.json && node scripts/copy-types.js && vite build && node scripts/generate-types.js",
     "build:types": "tsc --emitDeclarationOnly --outDir dist",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -60,7 +63,8 @@
     "react-dom": "^19.1.1",
     "tailwindcss": "^4.1.14",
     "postcss": "^8.5.6",
-    "autoprefixer": "^10.4.21"
+    "autoprefixer": "^10.4.21",
+    "typescript": "~5.9.3"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

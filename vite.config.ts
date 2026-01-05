@@ -8,11 +8,20 @@ export default defineConfig({
   plugins: [
     react(),
     dts({
-      include: ['src/**/*.ts', 'src/**/*.tsx'],
-      exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/pages/**/*', 'src/components/ResponsiveDemo.tsx', 'src/App.tsx', 'src/main.tsx'],
-      outDir: 'dist',
+      entryRoot: resolve(__dirname, 'src'),
+      include: [resolve(__dirname, 'src/**/*.ts'), resolve(__dirname, 'src/**/*.tsx')],
+      exclude: [
+        resolve(__dirname, 'src/**/*.test.ts'),
+        resolve(__dirname, 'src/**/*.test.tsx'),
+        resolve(__dirname, 'src/pages/**/*'),
+        resolve(__dirname, 'src/components/ResponsiveDemo.tsx'),
+        resolve(__dirname, 'src/App.tsx'),
+        resolve(__dirname, 'src/main.tsx'),
+      ],
+      outDir: resolve(__dirname, 'dist'),
       rollupTypes: false,
       copyDtsFiles: true,
+      insertTypesEntry: false,
     }),
   ],
   build: {

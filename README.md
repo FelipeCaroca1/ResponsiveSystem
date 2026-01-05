@@ -25,6 +25,7 @@ Este paquete instala automáticamente todas las dependencias necesarias:
 - ✅ **React DOM** (v19.1.1) - Se instala automáticamente  
 - ✅ **Tailwind CSS** (v4.1.14) - Se instala automáticamente
 - ✅ **PostCSS** y **Autoprefixer** - Se instalan automáticamente
+- ✅ **TypeScript** (v5.9.3) - Se instala automáticamente
 
 ```bash
 # Solo necesitas esto:

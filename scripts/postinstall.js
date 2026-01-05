@@ -28,6 +28,7 @@ const deps = { ...packageJson.dependencies, ...packageJson.devDependencies }
 // Verificar si React está instalado
 const hasReact = deps.react || fs.existsSync(path.join(projectRoot, 'node_modules', 'react'))
 const hasTailwind = deps.tailwindcss || fs.existsSync(path.join(projectRoot, 'node_modules', 'tailwindcss'))
+const hasTypeScript = deps.typescript || fs.existsSync(path.join(projectRoot, 'node_modules', 'typescript'))
 
 let needsInstall = false
 const packagesToInstall = []
@@ -39,6 +40,11 @@ if (!hasReact) {
 
 if (!hasTailwind) {
   packagesToInstall.push('tailwindcss@^4.1.14', 'postcss@^8.5.6', 'autoprefixer@^10.4.21')
+  needsInstall = true
+}
+
+if (!hasTypeScript) {
+  packagesToInstall.push('typescript@~5.9.3')
   needsInstall = true
 }
 
