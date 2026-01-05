@@ -3,17 +3,35 @@ import { ResponsiveProvider } from './index'
 import { useResponsive } from '../hooks'
 import { ResponsiveLayoutContext } from '../context'
 import { LAYOUT_CONFIG, DEFAULT_LAYOUT } from '../config/layout'
+import type { ResponsiveState } from '../types/responsive'
 
 interface ResponsiveLayoutProviderProps {
   children: React.ReactNode
   defaultLayout?: string
+  /**
+   * Hook responsivo personalizado del proyecto consumidor.
+   * Si se proporciona, se usará en lugar del hook interno del paquete.
+   * Debe retornar un objeto compatible con ResponsiveState.
+   */
+  useResponsiveHook?: () => ResponsiveState
 }
 
-const ResponsiveLayoutProviderInner: React.FC<{ children: React.ReactNode; defaultLayout: string }> = ({ 
+interface ResponsiveLayoutProviderInnerProps {
+  children: React.ReactNode
+  defaultLayout: string
+  useResponsiveHook?: () => ResponsiveState
+}
+
+const ResponsiveLayoutProviderInner: React.FC<ResponsiveLayoutProviderInnerProps> = ({ 
   children, 
-  defaultLayout 
+  defaultLayout,
+  useResponsiveHook
 }) => {
-  const responsive = useResponsive()
+  // Usar hook personalizado si se proporciona, sino usar el hook interno
+  const internalResponsive = useResponsive()
+  const customResponsive = useResponsiveHook?.()
+  const responsive = customResponsive || internalResponsive
+  
   const [currentLayout, setCurrentLayout] = useState(defaultLayout)
   
   const layoutConfig = LAYOUT_CONFIG[currentLayout] || LAYOUT_CONFIG[DEFAULT_LAYOUT]
@@ -58,11 +76,15 @@ const ResponsiveLayoutProviderInner: React.FC<{ children: React.ReactNode; defau
 
 export const ResponsiveLayoutProvider: React.FC<ResponsiveLayoutProviderProps> = ({ 
   children, 
-  defaultLayout = DEFAULT_LAYOUT 
+  defaultLayout = DEFAULT_LAYOUT,
+  useResponsiveHook
 }) => {
   return (
     <ResponsiveProvider>
-      <ResponsiveLayoutProviderInner defaultLayout={defaultLayout}>
+      <ResponsiveLayoutProviderInner 
+        defaultLayout={defaultLayout}
+        useResponsiveHook={useResponsiveHook}
+      >
         {children}
       </ResponsiveLayoutProviderInner>
     </ResponsiveProvider>

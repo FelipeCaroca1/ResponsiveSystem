@@ -1,0 +1,49 @@
+# Desarrollo
+node_modules/
+.vscode/
+.idea/
+*.log
+*.local
+
+# Build y desarrollo (dist/ NO se excluye, es necesario para el paquete)
+.vite/
+.temp/
+.cache/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Configuración
+.env
+.env.local
+.env.*.local
+
+# Archivos de ejemplo/demo
+src/pages/
+src/components/ResponsiveDemo.tsx
+src/App.tsx
+src/main.tsx
+src/App.css
+src/index.css
+src/assets/
+
+# Archivos de configuración de desarrollo
+vite.config.ts
+tsconfig*.json
+eslint.config.js
+postcss.config.js
+tailwind.config.js
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Otros
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+

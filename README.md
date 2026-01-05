@@ -10,8 +10,46 @@
 - ✅ **Sistema de Layouts**: 4 layouts predefinidos (Default, Sidebar, Dashboard, Minimal)
 - ✅ **9 Breakpoints**: xs, sm, md, lg, xl, 2xl, 3xl (1920px), 4xl (2560px), 5xl (3840px)
 - ✅ **TypeScript**: 100% type-safe
-- ✅ **Zero Dependencies**: Solo Tailwind CSS
+- ✅ **Zero Runtime Dependencies**: Solo requiere React y Tailwind como peer dependencies
 - ✅ **No Invasivo**: Instala solo lo que necesites ([Ver guía](INSTALLATION.md))
+
+---
+
+## 📦 Instalación desde npm
+
+### **Instalación Automática**
+
+Este paquete instala automáticamente todas las dependencias necesarias:
+
+- ✅ **React** (v19.1.1) - Se instala automáticamente
+- ✅ **React DOM** (v19.1.1) - Se instala automáticamente  
+- ✅ **Tailwind CSS** (v4.1.14) - Se instala automáticamente
+- ✅ **PostCSS** y **Autoprefixer** - Se instalan automáticamente
+
+```bash
+# Solo necesitas esto:
+npm install responsive-system
+```
+
+El script `postinstall` detectará si faltan dependencias y las instalará automáticamente.
+
+### **Inicializar Tailwind (solo la primera vez)**
+
+Después de instalar, inicializa Tailwind:
+
+```bash
+npx tailwindcss init -p
+```
+
+O con yarn/pnpm:
+```bash
+yarn add responsive-system
+# o
+pnpm add responsive-system
+
+# Inicializar Tailwind
+npx tailwindcss init -p
+```
 
 ---
 
@@ -27,13 +65,32 @@
 
 ---
 
-## 🚀 Instalación Rápida (Proyecto Nuevo)
+## 🚀 Inicio Rápido (Proyecto Nuevo)
+
+### **Paso 0: Instalar el paquete**
+
+Si estás empezando desde cero:
+
+```bash
+# Crear proyecto React (si no lo tienes)
+npm create vite@latest mi-proyecto -- --template react-ts
+
+# Instalar el paquete (instala React y Tailwind automáticamente)
+cd mi-proyecto
+npm install
+npm install responsive-system
+
+# Inicializar Tailwind (solo la primera vez)
+npx tailwindcss init -p
+```
+
+**¡Eso es todo!** El paquete instala automáticamente React, Tailwind y todas las dependencias necesarias.
 
 ### **1. Configura el Plugin en Tailwind**
 
 ```js
 // tailwind.config.js
-import responsiveScalePlugin from './src/plugin/responsiveScalePlugin.js'
+import responsiveScalePlugin from 'responsive-system/plugin'
 
 export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
@@ -70,7 +127,7 @@ export default {
 
 ```tsx
 // App.tsx
-import { ResponsiveLayoutProvider, MainLayout } from './index'
+import { ResponsiveLayoutProvider, MainLayout } from 'responsive-system'
 
 function App() {
   return (
@@ -114,7 +171,7 @@ El plugin genera CSS variables que escalan automáticamente:
 
 **Cambio Dinámico:**
 ```tsx
-import { useLayout } from './hooks'
+import { useLayout } from 'responsive-system'
 
 function MyComponent() {
   const { setLayout } = useLayout()
@@ -148,7 +205,7 @@ function MyComponent() {
 ## 🔧 Uso del Hook
 
 ```tsx
-import { useResponsiveLayout } from './hooks'
+import { useResponsiveLayout } from 'responsive-system'
 
 function MyComponent() {
   const { 
@@ -199,7 +256,7 @@ function MyComponent() {
 
 ### **Default Layout**
 ```tsx
-import { ResponsiveLayoutProvider, MainLayout } from './index'
+import { ResponsiveLayoutProvider, MainLayout } from 'responsive-system'
 
 <ResponsiveLayoutProvider defaultLayout="default">
   <MainLayout>
@@ -211,7 +268,7 @@ import { ResponsiveLayoutProvider, MainLayout } from './index'
 
 ### **Sidebar Layout**
 ```tsx
-import { ResponsiveLayoutProvider, MainLayout } from './index'
+import { ResponsiveLayoutProvider, MainLayout } from 'responsive-system'
 
 <ResponsiveLayoutProvider defaultLayout="sidebar">
   <MainLayout>
@@ -223,7 +280,7 @@ import { ResponsiveLayoutProvider, MainLayout } from './index'
 
 ### **Dashboard Layout**
 ```tsx
-import { ResponsiveLayoutProvider, MainLayout } from './index'
+import { ResponsiveLayoutProvider, MainLayout } from 'responsive-system'
 
 <ResponsiveLayoutProvider defaultLayout="dashboard">
   <MainLayout>
@@ -278,7 +335,7 @@ src/
 
 ```tsx
 // App.tsx
-import { ResponsiveLayoutProvider, MainLayout, useResponsiveLayout } from './index'
+import { ResponsiveLayoutProvider, MainLayout, useResponsiveLayout } from 'responsive-system'
 
 function MyApp() {
   return (

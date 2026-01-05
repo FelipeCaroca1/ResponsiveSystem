@@ -11,17 +11,27 @@
  * 
  * 2. Usa el ResponsiveLayoutProvider + MainLayout:
  *    <ResponsiveLayoutProvider defaultLayout="default">
- *      <MainLayout layout="default">
+ *      <MainLayout>
  *        <App />
  *      </MainLayout>
  *    </ResponsiveLayoutProvider>
  * 
- * 3. Usa Tailwind NORMAL en tus páginas:
+ * 3. Selección de layout (múltiples opciones):
+ *    - Por prop: <MainLayout layout="dashboard">...</MainLayout>
+ *    - Por contexto: const { setLayout } = useResponsiveLayout(); setLayout('sidebar')
+ *    - Por defaultLayout: <ResponsiveLayoutProvider defaultLayout="dashboard">
+ * 
+ * 4. Hook responsivo personalizado (opcional):
+ *    <ResponsiveLayoutProvider useResponsiveHook={tuHookPersonalizado}>
+ *      ...
+ *    </ResponsiveLayoutProvider>
+ * 
+ * 5. Usa Tailwind NORMAL en tus páginas:
  *    <div className="p-6 text-base">
  *      TODO escala automáticamente + layout consistente
  *    </div>
  * 
- * 4. (Opcional) Usa hooks para casos avanzados:
+ * 6. (Opcional) Usa hooks para casos avanzados:
  *    const { layout, responsive } = useResponsiveLayout()
  */
 
@@ -83,8 +93,8 @@ export type { LayoutConfig } from './config/layout'
 // import responsiveScalePlugin from './src/plugin/responsiveScalePlugin.js'
 
 // ========================================
-// EJEMPLOS (Solo para testing en este proyecto)
+// EJEMPLOS (Solo para testing en este proyecto - NO exportados en npm)
 // ========================================
 
-export { default as ResponsiveTestPage } from './pages/ResponsiveTestPage'
-export { default as ResponsiveDemo } from './components/ResponsiveDemo'
+// Los ejemplos no se exportan en el paquete npm
+// Solo están disponibles durante el desarrollo local

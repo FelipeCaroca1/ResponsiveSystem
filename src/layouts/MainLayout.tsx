@@ -9,12 +9,20 @@ import {
 
 interface MainLayoutProps {
   children: React.ReactNode
+  /**
+   * Layout específico a usar. Si se proporciona, sobrescribe el layout del contexto.
+   * Valores posibles: 'default', 'sidebar', 'dashboard', 'minimal'
+   */
+  layout?: 'default' | 'sidebar' | 'dashboard' | 'minimal'
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({ children, layout: layoutProp }) => {
   const { layout } = useResponsiveLayout()
   
-  // Seleccionar el layout apropiado basado en el estado del contexto
+  // Usar el layout del prop si se proporciona, sino usar el del contexto
+  const currentLayout = layoutProp || layout.current
+  
+  // Seleccionar el layout apropiado basado en el estado del contexto o prop
   const layouts = {
     default: DefaultLayout,
     sidebar: SidebarLayout,
@@ -22,7 +30,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     minimal: MinimalLayout,
   }
   
-  const LayoutComponent = layouts[layout.current as keyof typeof layouts] || DefaultLayout
+  const LayoutComponent = layouts[currentLayout as keyof typeof layouts] || DefaultLayout
   
   return <LayoutComponent>{children}</LayoutComponent>
 }
