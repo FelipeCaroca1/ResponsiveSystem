@@ -8,10 +8,11 @@ export default defineConfig({
   plugins: [
     react(),
     dts({
-      include: ['src/**/*'],
+      include: ['src/**/*.ts', 'src/**/*.tsx'],
       exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/pages/**/*', 'src/components/ResponsiveDemo.tsx', 'src/App.tsx', 'src/main.tsx'],
       outDir: 'dist',
-      rollupTypes: true,
+      rollupTypes: false,
+      copyDtsFiles: true,
     }),
   ],
   build: {
@@ -32,6 +33,6 @@ export default defineConfig({
       },
     },
     sourcemap: true,
-    minify: 'terser',
+    minify: 'esbuild',
   },
 })
