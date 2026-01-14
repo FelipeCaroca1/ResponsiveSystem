@@ -1,17 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Script postinstall para automatizar la configuración inicial completa
- * - Instala React, TypeScript, Tailwind automáticamente
- * - Inicializa proyecto Vite si está vacío
- * - Pregunta qué layout quiere (interactivo)
- * - Copia solo los componentes necesarios
- * - Copia el hook useResponsive como archivo local
- * - Crea página de ejemplo en pages/
- * - Configura App.tsx con el layout seleccionado
+ * Script de configuración para responsive-system
+ * - Instala React, TypeScript, Tailwind y Vite automáticamente
+ * - Permite seleccionar el layout (interactivo)
+ * - Crea estructura base del proyecto
+ * - Genera componentes genéricos y página de ejemplo
  */
 
-import fs from 'fs'
+import * as fs from 'fs'
 import path from 'path'
 import { execSync } from 'child_process'
 import { fileURLToPath } from 'url'
@@ -20,12 +17,20 @@ import readline from 'readline'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Obtener el directorio del proyecto consumidor
 const projectRoot = process.cwd()
 const packageJsonPath = path.join(projectRoot, 'package.json')
 
-// Detectar si se ejecuta como postinstall o manualmente
-const isPostinstall = process.env.npm_lifecycle_event === 'postinstall'
-const isManual = process.argv[1].includes('postinstall.js') && !isPostinstall
+// Detectar si se ejecuta desde node_modules (paquete instalado)
+const scriptPath = fileURLToPath(import.meta.url)
+const isFromNodeModules = scriptPath.includes('node_modules') && scriptPath.includes('responsive-system')
+
+// Detectar si se ejecuta con npx (ejecución interactiva)
+// Cuando se ejecuta con npx, process.argv[1] contiene el path del script ejecutado
+const isNpxExecution = process.argv[1] && (
+  process.argv[1].includes('responsive-system-setup') ||
+  process.argv[1].includes('postinstall.js')
+)
 
 // Detectar CI/CD environments
 const isCI = !!(
@@ -40,7 +45,12 @@ const isCI = !!(
 )
 
 // Si está en CI/CD, salir silenciosamente
-if (isCI && isPostinstall) {
+if (isCI && isFromNodeModules) {
+  process.exit(0)
+}
+
+// Si NO viene de node_modules, no hacer nada (evitar ejecución accidental desde el paquete fuente)
+if (!isFromNodeModules) {
   process.exit(0)
 }
 
@@ -55,37 +65,12 @@ if (!fs.existsSync(packageJsonPath)) {
   process.exit(0)
 }
 
-let packageJson
-try {
-  packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
-} catch (error) {
-  console.error('❌ Error al leer package.json:', error.message)
-  process.exit(1)
-}
-
-// Verificar si el proyecto está vacío (solo tiene responsive-system)
-const isProjectEmpty = !packageJson.dependencies || 
-                       Object.keys(packageJson.dependencies).length === 0 ||
-                       (Object.keys(packageJson.dependencies).length === 1 && packageJson.dependencies['responsive-system'])
-
-// Verificar qué está instalado - SOLO en package.json (no en node_modules para evitar conflictos)
-const hasReactInPackageJson = (packageJson.dependencies && packageJson.dependencies.react) || 
-                              (packageJson.devDependencies && packageJson.devDependencies.react)
-const hasVite = packageJson.devDependencies && packageJson.devDependencies.vite
-const tailwindInDevDeps = packageJson.devDependencies && packageJson.devDependencies.tailwindcss
-const typescriptInDevDeps = packageJson.devDependencies && packageJson.devDependencies.typescript
-
-let needsUpdate = false
+// packageJson se leerá dentro de la función async
 
 // Función para preguntar al usuario qué layout quiere
 async function askLayout() {
-  if (isPostinstall && !isManual) {
-    console.log('   ℹ️  Usando layout "default" por defecto')
-    console.log('   💡 Ejecuta "npx responsive-system-setup" para cambiar el layout')
-    return 'default'
-  }
-
-  // Si es ejecución manual, preguntar interactivamente
+  // Siempre preguntar interactivamente cuando se ejecuta con npx
+  // Solo usar default si no hay stdin disponible (CI/CD o ejecución no interactiva)
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
@@ -408,88 +393,44 @@ export { DEFAULT_BREAKPOINTS, getCurrentBreakpoint, getBreakpointIndex, getBreak
   console.log('      ✅ hooks/index.ts')
 }
 
-console.log('📦 Verificando dependencias...')
-
-// Agregar React a dependencies SOLO si NO está en package.json
-if (!hasReactInPackageJson) {
-  console.log('   ➕ Agregando React a dependencies...')
-  if (!packageJson.dependencies) {
-    packageJson.dependencies = {}
+// Función async para manejar la configuración del proyecto
+(async () => {
+  // Verificar que fs.existsSync esté disponible
+  if (typeof fs.existsSync !== 'function') {
+    console.error('❌ Error: fs.existsSync no está disponible')
+    process.exit(1)
   }
-  packageJson.dependencies['react'] = '^19.1.1'
-  packageJson.dependencies['react-dom'] = '^19.1.1'
-  needsUpdate = true
-} else {
-  console.log('   ✅ React ya está instalado')
-}
 
-// Agregar Vite si el proyecto está vacío
-if (isProjectEmpty && !hasVite) {
-  console.log('   ➕ Agregando Vite a devDependencies...')
-  if (!packageJson.devDependencies) {
-    packageJson.devDependencies = {}
+  // Leer package.json dentro de la función async
+  let packageJson
+  try {
+    packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))
+  } catch (error) {
+    console.error('❌ Error al leer package.json:', error.message)
+    process.exit(1)
   }
-  packageJson.devDependencies['vite'] = '^7.1.7'
-  packageJson.devDependencies['@vitejs/plugin-react'] = '^5.0.4'
-  needsUpdate = true
-}
 
-// Agregar Tailwind y sus dependencias a devDependencies
-if (!tailwindInDevDeps) {
-  console.log('   ➕ Agregando Tailwind y PostCSS a devDependencies...')
-  if (!packageJson.devDependencies) {
-    packageJson.devDependencies = {}
+  // Verificar si el proyecto ya está configurado
+  const mainTsxPath = path.join(projectRoot, 'src', 'main.tsx')
+  const layoutsDir = path.join(projectRoot, 'src', 'layouts')
+  const viteConfigPath = path.join(projectRoot, 'vite.config.ts')
+  
+  let isAlreadyConfigured = false
+  try {
+    isAlreadyConfigured = fs.existsSync(mainTsxPath) && 
+      fs.existsSync(layoutsDir) && 
+      fs.existsSync(viteConfigPath)
+  } catch (e) {
+    console.error('❌ Error al verificar archivos existentes:', e.message)
+    isAlreadyConfigured = false
   }
-  packageJson.devDependencies['tailwindcss'] = '^4.1.14'
-  packageJson.devDependencies['@tailwindcss/postcss'] = '^4.1.14'
-  packageJson.devDependencies['postcss'] = '^8.5.6'
-  packageJson.devDependencies['autoprefixer'] = '^10.4.21'
-  needsUpdate = true
-}
 
-// Agregar TypeScript y sus tipos a devDependencies
-if (!typescriptInDevDeps) {
-  console.log('   ➕ Agregando TypeScript a devDependencies...')
-  if (!packageJson.devDependencies) {
-    packageJson.devDependencies = {}
-  }
-  packageJson.devDependencies['typescript'] = '~5.9.3'
-  packageJson.devDependencies['@types/react'] = '^19.1.16'
-  packageJson.devDependencies['@types/react-dom'] = '^19.1.9'
-  needsUpdate = true
-}
-
-// Agregar "type": "module" si no existe (para evitar warnings)
-if (!packageJson.type) {
-  packageJson.type = 'module'
-  needsUpdate = true
-}
-
-// Escribir package.json modificado
-if (needsUpdate) {
-  console.log('')
-  console.log('📝 Actualizando package.json...')
-  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
-  console.log('✅ package.json actualizado')
-  console.log('')
-  console.log('⚠️  Ejecuta "npm install" para instalar las dependencias')
-} else {
-  console.log('✅ Todas las dependencias ya están en package.json')
-}
-
-// Verificar si el proyecto ya está configurado
-const mainTsxPath = path.join(projectRoot, 'src', 'main.tsx')
-const layoutsDir = path.join(projectRoot, 'src', 'layouts')
-const isAlreadyConfigured = fs.existsSync(mainTsxPath) && fs.existsSync(layoutsDir) && fs.existsSync(path.join(projectRoot, 'vite.config.ts'))
-
-// Si el proyecto está vacío, crear estructura base
-if (isProjectEmpty) {
-  // Si ya está configurado, preguntar si quiere sobrescribir
+  // Si el proyecto ya está configurado, preguntar si quiere sobrescribir
   if (isAlreadyConfigured) {
     console.log('')
     console.log('⚠️  El proyecto ya está configurado')
     
-    if (isManual) {
+    if (process.stdin.isTTY) {
       const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
@@ -510,20 +451,123 @@ if (isProjectEmpty) {
       console.log('   ⚠️  Sobrescribiendo configuración...')
       console.log('')
     } else {
-      // Si es postinstall automático y ya está configurado, salir
-      console.log('   ✅ Proyecto ya configurado, saltando setup')
-      process.exit(0)
+      // No hay terminal interactivo, usar default
+      console.log('   ℹ️  Terminal no interactivo, usando layout "default"')
+      console.log('')
     }
   }
   
-  console.log('')
-  console.log('📦 Proyecto vacío detectado, creando estructura base...')
-  console.log('')
-  
-  // Preguntar qué layout quiere
+  // SIEMPRE preguntar qué layout quiere PRIMERO
   const selectedLayout = await askLayout()
   console.log(`   ✅ Layout seleccionado: "${selectedLayout}"`)
   console.log('')
+  
+  // Verificar si el proyecto está vacío (solo tiene responsive-system)
+  const isProjectEmpty = !packageJson.dependencies || 
+                           Object.keys(packageJson.dependencies).length === 0 ||
+                           (Object.keys(packageJson.dependencies).length === 1 && packageJson.dependencies['responsive-system'])
+
+  // Verificar qué está instalado - SOLO en package.json (no en node_modules para evitar conflictos)
+  const hasReactInPackageJson = (packageJson.dependencies && packageJson.dependencies.react) || 
+                                (packageJson.devDependencies && packageJson.devDependencies.react)
+  const hasVite = packageJson.devDependencies && packageJson.devDependencies.vite
+  const tailwindInDevDeps = packageJson.devDependencies && packageJson.devDependencies.tailwindcss
+  const typescriptInDevDeps = packageJson.devDependencies && packageJson.devDependencies.typescript
+
+  let needsUpdate = false
+  
+  // Si el proyecto está vacío, crear estructura base
+  if (isProjectEmpty) {
+    console.log('')
+    console.log('📦 Proyecto vacío detectado, creando estructura base...')
+    console.log('')
+  }
+  
+  console.log('📦 Verificando dependencias...')
+
+  // Agregar React a dependencies SOLO si NO está en package.json
+  if (!hasReactInPackageJson) {
+    console.log('   ➕ Agregando React a dependencies...')
+    if (!packageJson.dependencies) {
+      packageJson.dependencies = {}
+    }
+    packageJson.dependencies['react'] = '^19.1.1'
+    packageJson.dependencies['react-dom'] = '^19.1.1'
+    needsUpdate = true
+  } else {
+    console.log('   ✅ React ya está instalado')
+  }
+
+  // Agregar Vite si el proyecto está vacío
+  if (isProjectEmpty && !hasVite) {
+    console.log('   ➕ Agregando Vite a devDependencies...')
+    if (!packageJson.devDependencies) {
+      packageJson.devDependencies = {}
+    }
+    packageJson.devDependencies['vite'] = '^7.1.7'
+    packageJson.devDependencies['@vitejs/plugin-react'] = '^5.0.4'
+    needsUpdate = true
+  }
+
+  // Agregar Tailwind y sus dependencias a devDependencies
+  if (!tailwindInDevDeps) {
+    console.log('   ➕ Agregando Tailwind y PostCSS a devDependencies...')
+    if (!packageJson.devDependencies) {
+      packageJson.devDependencies = {}
+    }
+    packageJson.devDependencies['tailwindcss'] = '^4.1.14'
+    packageJson.devDependencies['@tailwindcss/postcss'] = '^4.1.14'
+    packageJson.devDependencies['postcss'] = '^8.5.6'
+    packageJson.devDependencies['autoprefixer'] = '^10.4.21'
+    needsUpdate = true
+  }
+
+  // Agregar TypeScript y sus tipos a devDependencies
+  if (!typescriptInDevDeps) {
+    console.log('   ➕ Agregando TypeScript a devDependencies...')
+    if (!packageJson.devDependencies) {
+      packageJson.devDependencies = {}
+    }
+    packageJson.devDependencies['typescript'] = '~5.9.3'
+    packageJson.devDependencies['@types/react'] = '^19.1.16'
+    packageJson.devDependencies['@types/react-dom'] = '^19.1.9'
+    needsUpdate = true
+  }
+
+  // Agregar "type": "module" si no existe (para evitar warnings)
+  if (!packageJson.type) {
+    packageJson.type = 'module'
+    needsUpdate = true
+  }
+
+  // SIEMPRE escribir package.json después de modificarlo (aunque no haya cambios, para asegurar que esté actualizado)
+  console.log('')
+  console.log('📝 Actualizando package.json...')
+  try {
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n')
+    console.log('✅ package.json actualizado')
+    console.log('')
+  } catch (error) {
+    console.error('❌ Error al escribir package.json:', error.message)
+    process.exit(1)
+  }
+  
+  // Instalar dependencias si se agregaron nuevas
+  if (needsUpdate) {
+    console.log('📦 Instalando dependencias...')
+    try {
+      execSync('npm install', { stdio: 'inherit', cwd: projectRoot })
+      console.log('✅ Dependencias instaladas')
+      console.log('')
+    } catch (error) {
+      console.error('❌ Error al instalar dependencias:', error.message)
+      console.log('⚠️  Por favor ejecuta "npm install" manualmente')
+      console.log('')
+    }
+  } else {
+    console.log('✅ Todas las dependencias ya están en package.json')
+    console.log('')
+  }
   
   // Crear estructura de directorios
   const dirs = ['src', 'src/components', 'src/components/layout', 'src/pages', 'src/hooks', 'src/types', 'src/constants', 'public']
@@ -543,7 +587,7 @@ if (isProjectEmpty) {
   console.log('')
   
   // Crear vite.config.ts
-  const viteConfigPath = path.join(projectRoot, 'vite.config.ts')
+  // viteConfigPath ya está declarado arriba
   if (!fs.existsSync(viteConfigPath)) {
     const viteConfig = `import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
@@ -681,7 +725,7 @@ export default {
   }
   
   // Crear layout local según el seleccionado
-  const layoutsDir = path.join(projectRoot, 'src', 'layouts')
+  // layoutsDir ya está declarado arriba
   if (!fs.existsSync(layoutsDir)) {
     fs.mkdirSync(layoutsDir, { recursive: true })
   }
@@ -802,7 +846,7 @@ export default MinimalLayout
   console.log(`   ✅ Creado: src/layouts/${path.basename(layoutPath)}`)
   
   // Crear src/main.tsx que use el layout local
-  const mainTsxPath = path.join(projectRoot, 'src', 'main.tsx')
+  // mainTsxPath ya está declarado arriba
   if (!fs.existsSync(mainTsxPath)) {
     const layoutName = selectedLayout.charAt(0).toUpperCase() + selectedLayout.slice(1) + 'Layout'
     const mainTsx = `import React from 'react'
@@ -967,10 +1011,11 @@ export default App
   console.log('')
   console.log('💡 Para cambiar el layout: npx responsive-system-setup')
   console.log('')
-} else {
-  console.log('✅ Proyecto ya inicializado')
-}
 
-console.log('')
-console.log('✅ Configuración completada')
-console.log('')
+  console.log('')
+  console.log('✅ Configuración completada')
+  console.log('')
+})().catch((error) => {
+  console.error('❌ Error durante la configuración:', error)
+  process.exit(1)
+})

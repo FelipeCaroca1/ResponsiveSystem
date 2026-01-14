@@ -1,6 +1,6 @@
 {
   "name": "responsive-system",
-  "version": "1.7.0",
+  "version": "1.7.26",
   "description": "Sistema de layout responsivo con auto-scaling para Tailwind CSS",
   "type": "module",
   "main": "./dist/responsive-system.cjs",
@@ -58,7 +58,6 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "prepublishOnly": "npm run build",
-    "postinstall": "node scripts/postinstall.js",
     "test:postinstall": "node scripts/test-postinstall.js"
   },
   "dependencies": {
