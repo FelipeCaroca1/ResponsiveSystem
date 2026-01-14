@@ -8,13 +8,10 @@ interface SidebarLayoutProps {
 
 const SidebarLayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
+    <div className="min-h-screen flex h-screen">
       <Sidebar />
-      
-      {/* Main content */}
-      <main className="flex-1 overflow-auto">
-          {children}
+      <main className="flex-1 overflow-y-auto overflow-x-hidden">
+        {children}
       </main>
     </div>
   )

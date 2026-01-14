@@ -27,6 +27,23 @@ const packageJsonPath = path.join(projectRoot, 'package.json')
 const isPostinstall = process.env.npm_lifecycle_event === 'postinstall'
 const isManual = process.argv[1].includes('postinstall.js') && !isPostinstall
 
+// Detectar CI/CD environments
+const isCI = !!(
+  process.env.CI ||
+  process.env.VERCEL ||
+  process.env.NETLIFY ||
+  process.env.GITHUB_ACTIONS ||
+  process.env.GITLAB_CI ||
+  process.env.CIRCLECI ||
+  process.env.TRAVIS ||
+  process.env.JENKINS_URL
+)
+
+// Si está en CI/CD, salir silenciosamente
+if (isCI && isPostinstall) {
+  process.exit(0)
+}
+
 console.log('')
 console.log('📦 responsive-system: Iniciando configuración...')
 console.log(`   Directorio: ${projectRoot}`)
@@ -178,19 +195,23 @@ const Navigation = () => {
   const { isMobile } = useResponsiveLayout()
   
   return (
-    <nav className="sticky top-0 z-50 bg-gray-900 border-b border-gray-800">
+    <nav className="sticky top-0 z-50 border-b bg-white">
       <div className="px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">LO</span>
+            <div className="w-8 h-8 border rounded flex items-center justify-center flex-shrink-0">
+              <span className="text-sm">Logo</span>
             </div>
-            <h1 className="text-white font-semibold text-lg">Tu Aplicación</h1>
+            <h1 className="font-semibold text-lg truncate">App Name</h1>
           </div>
           
           {isMobile && (
-            <button className="p-2 text-gray-400 hover:text-white">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button
+              type="button"
+              aria-label="Toggle menu"
+              className="p-2 rounded transition-opacity hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-offset-2"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -211,11 +232,11 @@ export default Navigation
   if (components.includes('Footer')) {
     const footerContent = `const Footer = () => {
   return (
-    <footer className="bg-gray-900 border-t border-gray-800">
+    <footer className="border-t flex-shrink-0" role="contentinfo">
       <div className="px-4 py-6">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} Tu Aplicación. Todos los derechos reservados.
+          <p className="text-sm">
+            © {new Date().getFullYear()} Your App. All rights reserved.
           </p>
         </div>
       </div>
@@ -234,45 +255,56 @@ export default Footer
     const sidebarContent = `import { useResponsiveLayout } from 'responsive-system'
 import { useSidebar } from 'responsive-system'
 
-const Sidebar = () => {
+interface SidebarProps {
+  showLogo?: boolean
+}
+
+const Sidebar = ({ showLogo = true }: SidebarProps) => {
   const { isMobile, isTablet } = useResponsiveLayout()
   const { sidebarOpen, setSidebarOpen } = useSidebar()
   
   const menuItems = [
-    { id: 'home', label: 'Inicio' },
-    { id: 'about', label: 'Acerca' },
-    { id: 'contact', label: 'Contacto' },
+    { id: 'home', label: 'Home' },
+    { id: 'about', label: 'About' },
+    { id: 'contact', label: 'Contact' },
   ]
   
   return (
     <>
-      {/* Hamburger button para móvil */}
       {isMobile && (
         <button
+          type="button"
           onClick={() => setSidebarOpen(true)}
-          className="fixed top-4 left-4 z-50 p-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 bg-gray-900 border border-gray-700"
+          aria-label="Open sidebar"
+          className="fixed top-4 left-4 z-50 p-2 rounded border transition-opacity hover:opacity-75 focus:outline-none focus:ring-2 focus:ring-offset-2"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       )}
 
-      {/* Sidebar desktop */}
-      <aside className={\`bg-gray-900 border-r border-gray-800 \${isMobile ? 'hidden' : 'w-64 flex-shrink-0'} \${isTablet ? 'w-56' : 'w-64'}\`}>
-        <div className="p-6 flex flex-col h-full">
-          <div className="flex items-center space-x-3 mb-8">
-            <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">LO</span>
+      <aside 
+        className={\`border-r h-full \${isMobile ? 'hidden' : 'w-64 flex-shrink-0'} \${isTablet ? 'w-56' : 'w-64'}\`}
+        aria-label="Sidebar navigation"
+      >
+        <div className="p-6 flex flex-col h-full overflow-y-auto">
+          {showLogo && (
+            <div className="flex items-center space-x-3 mb-8 flex-shrink-0">
+              <div className="w-8 h-8 border rounded flex items-center justify-center flex-shrink-0">
+                <span className="text-sm">Logo</span>
+              </div>
+              <span className="font-bold text-lg truncate">App Name</span>
             </div>
-            <span className="text-white font-bold text-lg">Tu Aplicación</span>
-          </div>
+          )}
           
-          <nav className="space-y-2">
+          <nav className={\`space-y-2 flex-1 \${showLogo ? '' : 'pt-0'}\`} role="navigation" aria-label="Main navigation">
             {menuItems.map((item) => (
               <button
                 key={item.id}
-                className="w-full flex items-center px-4 py-3 rounded-lg transition-all text-left text-gray-300 hover:text-white hover:bg-gray-800"
+                type="button"
+                className="w-full flex items-center px-4 py-3 rounded transition-all text-left hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                aria-label={item.label}
               >
                 <span className="font-medium">{item.label}</span>
               </button>
@@ -281,32 +313,45 @@ const Sidebar = () => {
         </div>
       </aside>
 
-      {/* Sidebar móvil desplegable */}
       {isMobile && sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setSidebarOpen(false)}>
-          <div className="fixed top-0 left-0 w-64 h-full bg-gray-900 border-r border-gray-800">
+        <>
+          <div 
+            className="fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity"
+            onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
+          />
+          <aside 
+            className="fixed top-0 left-0 w-64 h-full border-r z-50 overflow-y-auto"
+            aria-label="Mobile sidebar navigation"
+            role="dialog"
+            aria-modal="true"
+          >
             <div className="p-6 flex flex-col h-full pt-20">
-              <div className="flex items-center space-x-3 mb-8">
-                <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">LO</span>
+              {showLogo && (
+                <div className="flex items-center space-x-3 mb-8 flex-shrink-0">
+                  <div className="w-8 h-8 border rounded flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm">Logo</span>
+                  </div>
+                  <span className="font-bold text-lg truncate">App Name</span>
                 </div>
-                <span className="text-white font-bold text-lg">Tu Aplicación</span>
-              </div>
+              )}
               
-              <nav className="space-y-2">
+              <nav className={\`space-y-2 flex-1 \${showLogo ? '' : 'pt-0'}\`} role="navigation" aria-label="Main navigation">
                 {menuItems.map((item) => (
                   <button
                     key={item.id}
+                    type="button"
                     onClick={() => setSidebarOpen(false)}
-                    className="w-full flex items-center px-4 py-3 rounded-lg transition-all text-left text-gray-300 hover:text-white hover:bg-gray-800"
+                    className="w-full flex items-center px-4 py-3 rounded transition-all text-left hover:bg-opacity-10 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    aria-label={item.label}
                   >
                     <span className="font-medium">{item.label}</span>
                   </button>
                 ))}
               </nav>
             </div>
-          </div>
-        </div>
+          </aside>
+        </>
       )}
     </>
   )
@@ -427,25 +472,50 @@ if (needsUpdate) {
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
   console.log('✅ package.json actualizado')
   console.log('')
-  
-  // Ahora instalar las dependencias
-  console.log('📦 Instalando dependencias...')
-  try {
-    execSync('npm install', {
-      stdio: 'inherit',
-      cwd: projectRoot
-    })
-    console.log('✅ Dependencias instaladas correctamente')
-  } catch (error) {
-    console.error('❌ Error al instalar dependencias:', error.message)
-    console.log('⚠️  Las dependencias están en package.json, ejecuta "npm install" manualmente')
-  }
+  console.log('⚠️  Ejecuta "npm install" para instalar las dependencias')
 } else {
-  console.log('✅ Todas las dependencias ya están instaladas')
+  console.log('✅ Todas las dependencias ya están en package.json')
 }
+
+// Verificar si el proyecto ya está configurado
+const mainTsxPath = path.join(projectRoot, 'src', 'main.tsx')
+const layoutsDir = path.join(projectRoot, 'src', 'layouts')
+const isAlreadyConfigured = fs.existsSync(mainTsxPath) && fs.existsSync(layoutsDir) && fs.existsSync(path.join(projectRoot, 'vite.config.ts'))
 
 // Si el proyecto está vacío, crear estructura base
 if (isProjectEmpty) {
+  // Si ya está configurado, preguntar si quiere sobrescribir
+  if (isAlreadyConfigured) {
+    console.log('')
+    console.log('⚠️  El proyecto ya está configurado')
+    
+    if (isManual) {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      })
+      
+      const answer = await new Promise((resolve) => {
+        rl.question('   ¿Deseas sobrescribir la configuración existente? (s/n): ', (answer) => {
+          rl.close()
+          resolve(answer.trim().toLowerCase())
+        })
+      })
+      
+      if (answer !== 's' && answer !== 'si' && answer !== 'y' && answer !== 'yes') {
+        console.log('   ✅ Configuración existente preservada')
+        process.exit(0)
+      }
+      
+      console.log('   ⚠️  Sobrescribiendo configuración...')
+      console.log('')
+    } else {
+      // Si es postinstall automático y ya está configurado, salir
+      console.log('   ✅ Proyecto ya configurado, saltando setup')
+      process.exit(0)
+    }
+  }
+  
   console.log('')
   console.log('📦 Proyecto vacío detectado, creando estructura base...')
   console.log('')
@@ -628,9 +698,9 @@ interface DefaultLayoutProps {
 
 const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Navigation />
-      <main className="flex-1">
+      <main className="flex-1 overflow-x-hidden">
         {children}
       </main>
       <Footer />
@@ -651,9 +721,9 @@ interface SidebarLayoutProps {
 
 const SidebarLayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen flex h-screen">
       <Sidebar />
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden">
         {children}
       </main>
     </div>
@@ -672,7 +742,7 @@ export default SidebarLayout
 `
   } else if (selectedLayout === 'dashboard') {
     layoutContent = `import React from 'react'
-import { Sidebar, Footer } from '../components/layout'
+import { Navigation, Sidebar, Footer } from '../components/layout'
 import { SidebarProvider } from 'responsive-system'
 
 interface DashboardLayoutProps {
@@ -681,10 +751,11 @@ interface DashboardLayoutProps {
 
 const DashboardLayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="flex flex-1">
-        <Sidebar />
-        <main className="flex-1 overflow-auto flex flex-col">
+    <div className="min-h-screen flex flex-col h-screen">
+      <Navigation />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar showLogo={false} />
+        <main className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col">
           <div className="flex-1">
             {children}
           </div>
@@ -714,7 +785,7 @@ interface MinimalLayoutProps {
 
 const MinimalLayout: React.FC<MinimalLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <main>
         {children}
       </main>
@@ -771,77 +842,74 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 import { useResponsive } from '../hooks'
 
 function HomePage() {
-  const { breakpoint, isMobile, layout } = useResponsiveLayout()
+  const { breakpoint, isMobile, width, height, layout } = useResponsiveLayout()
   const responsive = useResponsive()
 
   return (
-    <div className="py-8 px-4">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Hero Section */}
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Bienvenido a tu Aplicación
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Esta es una página de ejemplo que demuestra el sistema responsive con auto-scaling.
-            Todo el contenido se ajusta automáticamente según el tamaño de pantalla.
+    <div className="p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <header className="border rounded p-6 text-center">
+          <h1 className="text-3xl font-bold mb-2">Welcome to Your App</h1>
+          <p className="text-lg opacity-75">
+            This is an example page showing the responsive system with auto-scaling.
           </p>
-        </div>
+        </header>
 
         {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
-            <h3 className="text-sm font-semibold text-blue-900 mb-2">Breakpoint</h3>
-            <p className="text-2xl font-bold text-blue-700">{breakpoint.toUpperCase()}</p>
-          </div>
-          <div className="bg-green-50 rounded-lg p-6 border border-green-200">
-            <h3 className="text-sm font-semibold text-green-900 mb-2">Dispositivo</h3>
-            <p className="text-2xl font-bold text-green-700">{isMobile ? 'Móvil' : 'Desktop'}</p>
-          </div>
-          <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
-            <h3 className="text-sm font-semibold text-purple-900 mb-2">Ancho</h3>
-            <p className="text-2xl font-bold text-purple-700">{responsive.width}px</p>
-          </div>
-          <div className="bg-orange-50 rounded-lg p-6 border border-orange-200">
-            <h3 className="text-sm font-semibold text-orange-900 mb-2">Alto</h3>
-            <p className="text-2xl font-bold text-orange-700">{responsive.height}px</p>
-          </div>
-        </div>
+        <section aria-label="Responsive information" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <article className="border rounded p-4">
+            <h3 className="text-sm font-semibold mb-2">Breakpoint</h3>
+            <p className="text-2xl font-bold" aria-live="polite">{breakpoint.toUpperCase()}</p>
+          </article>
+          <article className="border rounded p-4">
+            <h3 className="text-sm font-semibold mb-2">Device</h3>
+            <p className="text-2xl font-bold" aria-live="polite">{isMobile ? 'Mobile' : 'Desktop'}</p>
+          </article>
+          <article className="border rounded p-4">
+            <h3 className="text-sm font-semibold mb-2">Width</h3>
+            <p className="text-2xl font-bold" aria-live="polite">{width}px</p>
+          </article>
+          <article className="border rounded p-4">
+            <h3 className="text-sm font-semibold mb-2">Height</h3>
+            <p className="text-2xl font-bold" aria-live="polite">{height}px</p>
+          </article>
+        </section>
 
         {/* Content Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-white font-bold text-xl">{i}</span>
+        <section aria-label="Example content cards" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <article key={i} className="border rounded p-6">
+              <div className="w-12 h-12 border rounded flex items-center justify-center mb-4 flex-shrink-0" aria-hidden="true">
+                <span className="font-bold">{i}</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Card {i}</h3>
-              <p className="text-gray-600">
-                Este es un ejemplo de card. El texto, espaciado y sombras se ajustan automáticamente
-                según el tamaño de pantalla gracias al sistema de auto-scaling.
+              <h3 className="text-xl font-bold mb-2">Card {i}</h3>
+              <p className="opacity-75">
+                This is an example card. All content scales automatically based on screen size
+                thanks to the auto-scaling system.
               </p>
-            </div>
+            </article>
           ))}
-        </div>
+        </section>
 
         {/* Info Section */}
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Sistema Responsive</h2>
-          <div className="space-y-3 text-gray-700">
+        <section className="border rounded p-6">
+          <h2 className="text-2xl font-bold mb-4">Responsive System</h2>
+          <div className="space-y-3">
             <p>
-              <strong className="text-gray-900">Auto-scaling activo:</strong> Todo el contenido escala
-              automáticamente según el breakpoint actual (texto, espaciado, sombras).
+              <strong>Auto-scaling active:</strong> All content scales automatically based on
+              the current breakpoint (text, spacing, shadows).
             </p>
             <p>
-              <strong className="text-gray-900">Hook useResponsive:</strong> Disponible en{' '}
-              <code className="bg-gray-100 px-2 py-1 rounded text-sm">src/hooks/useResponsive.ts</code>{' '}
-              para configuración manual cuando lo necesites.
+              <strong>Hook useResponsive:</strong> Available in{' '}
+              <code className="bg-opacity-10 px-2 py-1 rounded text-sm font-mono">src/hooks/useResponsive.ts</code>{' '}
+              for manual configuration when needed.
             </p>
             <p>
-              <strong className="text-gray-900">Layout actual:</strong> <span className="capitalize">{layout.current}</span>
+              <strong>Current layout:</strong> <span className="capitalize">{layout.current}</span>
             </p>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   )

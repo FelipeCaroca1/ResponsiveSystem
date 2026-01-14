@@ -1,5 +1,5 @@
 import React from 'react'
-import { Sidebar, Footer } from '../components/layout'
+import { Navigation, Sidebar, Footer } from '../components/layout'
 import { SidebarProvider } from '../context'
 
 interface DashboardLayoutProps {
@@ -8,19 +8,14 @@ interface DashboardLayoutProps {
 
 const DashboardLayoutContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Content area con sidebar */}
-      <div className="flex flex-1">
-        {/* Sidebar */}
-        <Sidebar />
-        
-        {/* Main content */}
-        <main className="flex-1 overflow-auto flex flex-col">
+    <div className="min-h-screen flex flex-col h-screen">
+      <Navigation />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar showLogo={false} />
+        <main className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col">
           <div className="flex-1">
             {children}
           </div>
-          
-          {/* Footer */}
           <Footer />
         </main>
       </div>

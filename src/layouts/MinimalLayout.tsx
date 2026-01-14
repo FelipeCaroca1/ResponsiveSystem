@@ -6,7 +6,7 @@ interface MinimalLayoutProps {
 
 const MinimalLayout: React.FC<MinimalLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <main>
         {children}
       </main>

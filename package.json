@@ -1,6 +1,6 @@
 {
   "name": "responsive-system",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "description": "Sistema de layout responsivo con auto-scaling para Tailwind CSS",
   "type": "module",
   "main": "./dist/responsive-system.cjs",

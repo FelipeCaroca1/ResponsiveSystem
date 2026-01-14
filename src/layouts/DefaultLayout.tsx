@@ -7,16 +7,11 @@ interface DefaultLayoutProps {
 
 const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Navigation fijo arriba */}
+    <div className="min-h-screen flex flex-col">
       <Navigation />
-      
-      {/* Main content */}
-      <main className="flex-1">
-          {children}
+      <main className="flex-1 overflow-x-hidden">
+        {children}
       </main>
-      
-      {/* Footer fijo abajo */}
       <Footer />
     </div>
   )

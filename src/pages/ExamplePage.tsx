@@ -1,9 +1,8 @@
-import { useResponsiveLayout } from 'responsive-system'
-import { useResponsive } from '../hooks'
+import { useResponsiveLayout } from '../hooks'
+import LayoutSwitcher from '../components/LayoutSwitcher'
 
-function HomePage() {
+const ExamplePage = () => {
   const { breakpoint, isMobile, width, height, layout } = useResponsiveLayout()
-  const responsive = useResponsive()
 
   return (
     <div className="p-6">
@@ -12,9 +11,14 @@ function HomePage() {
         <header className="border rounded p-6 text-center">
           <h1 className="text-3xl font-bold mb-2">Welcome to Your App</h1>
           <p className="text-lg opacity-75">
-            This is an example page showing the responsive system with auto-scaling.
+            This is an example page showing the responsive system with layout switching.
           </p>
         </header>
+
+        {/* Layout Switcher */}
+        <section aria-label="Layout selection">
+          <LayoutSwitcher />
+        </section>
 
         {/* Info Cards */}
         <section aria-label="Responsive information" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -75,4 +79,4 @@ function HomePage() {
   )
 }
 
-export default HomePage
+export default ExamplePage
